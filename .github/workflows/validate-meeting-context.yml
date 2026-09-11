@@ -23,4 +23,5 @@ jobs:
           cp target/debug/llama-helper frontend/src-tauri/binaries/llama-helper-aarch64-apple-darwin
       - name: Run native summary tests
         working-directory: frontend/src-tauri
-        run: cargo test --locked --lib summary::
+        run: |
+          cargo test --locked --lib summary::
