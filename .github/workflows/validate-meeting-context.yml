@@ -1,0 +1,26 @@
+name: Validate meeting summary context
+on:
+  push:
+    branches: [codex/validate-meeting-context]
+permissions:
+  contents: read
+jobs:
+  summary-tests:
+    runs-on: macos-latest
+    timeout-minutes: 55
+    env:
+      CARGO_BUILD_JOBS: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: '. -> target'
+      - name: Build required sidecar
+        run: |
+          cargo build --locked -p llama-helper --features metal
+          mkdir -p frontend/src-tauri/binaries
+          cp target/debug/llama-helper frontend/src-tauri/binaries/llama-helper-aarch64-apple-darwin
+      - name: Run native summary tests
+        working-directory: frontend/src-tauri
+        run: cargo test --locked --lib summary::
